@@ -1,5 +1,7 @@
 # Translation Mode Reference
 
+> **难度校准**: 生成任何翻译题目之前，必须先列出 3 个难度锚点。难度控制参照 [difficulty-calibration.md](difficulty-calibration.md) 中的量化指标。
+
 ## Goal
 
 Generate original Chinese paragraphs for translation, correct user translations, explain Chinese-to-English transfer problems, and provide standard and higher-scoring versions.
@@ -37,6 +39,21 @@ When the user selects translation:
 2. generate one original Chinese paragraph;
 3. do not provide the English answer immediately;
 4. ask the user to translate first.
+
+### Difficulty Anchor (Pre-Generation — Mandatory)
+
+生成翻译段落之前，先在内部列出 3 个难度锚点：
+
+> 翻译难度锚点：
+> 1. {锚点 1：如 "需要将中文四字格压缩为英文习惯表达，不能逐字翻译"}
+> 2. {锚点 2：如 "文化概念 '普惠金融' 需要解释性翻译而非字面对应"}
+> 3. {锚点 3：如 "中文无主语句子需补主语 + 英文被动语态的转换"}
+
+CET-6 翻译锚点必须包含：
+- 至少 1 个"结构调整"锚点（英文需要重组信息顺序而非逐句翻译）
+- 至少 1 个"文化/术语处理"锚点
+
+如果列不出 3 个具体锚点，重新设计翻译段落。
 
 If the user asks for immediate explanation, provide answer and breakdown.
 

@@ -26,6 +26,19 @@ The assistant may:
 - analyze user-provided excerpts at a high level;
 - generate fully original CET-style training tasks.
 
+### Required Topic Coverage (Safe Harbor)
+
+版权限制不意味着回避有挑战性的话题。以下方向**必须积极覆盖**，使用完全原创的具体题目：
+
+**CET-4 必覆盖**：校园生活、学习方法、数字习惯、健康、个人成长、志愿服务、社会观察
+
+**CET-6 必覆盖**：科技与社会、教育议题、职业发展、文化传播、伦理选择、可持续发展、公共政策、经济行为
+
+生成原则：
+- 话题属于以上方向 ≠ 与真题相似（同一方向可有无穷多种具体切入角度）
+- 避免与高频真题完全相同的"话题组合 + 文体 + 场景"叠加（如"科技 + 议论文 + AI 取代工作"是近年真题组合，应拆分或换角度）
+- 复杂度不因版权顾虑而降低 —— 原创题目仍须达到 [difficulty-calibration.md](reference/difficulty-calibration.md) 的全部指标
+
 Every generated exercise must include the label:
 
 > 以下为原创 CET-style 仿真模拟训练。
@@ -89,28 +102,15 @@ If the user asks for multiple sections, prioritize the section they named first,
 
 ## CET-4 vs CET-6 Difficulty Control
 
-### CET-4
+难度控制以 [reference/difficulty-calibration.md](reference/difficulty-calibration.md) 中的量化指标为准。该文件包含：
 
-Use:
-
-- shorter texts;
-- clearer logic;
-- higher-frequency vocabulary;
-- familiar student-life, learning, digital-life, health, campus, and common social topics;
-- direct reasoning and clearer answer evidence;
-- less abstract wording.
-
-### CET-6
-
-Use:
-
-- more abstract themes;
-- more complex syntax;
-- denser information;
-- more implicit logic;
-- stronger inference requirements;
-- more nuanced distractors;
-- topics such as technology and society, public issues, education, cultural communication, career development, sustainability, ethics, and social change.
+- 词汇难度（CET-4/CET-6 词表覆盖比例、超纲词限制）
+- 句法复杂度（平均句长、从句层级、特殊句式要求）
+- 信息密度（每段信息点数、"水分句"检测标准）
+- 推理深度（L0–L3 四级分层、各等级题目分布比例）
+- 干扰项质量（G1–G5 五级分类、分布要求）
+- 文本真实感（CET-6 必选文本特征清单）
+- 生成前难度锚点 + 生成后自检清单（**必做**）
 
 ### Practical Difficulty Defaults
 
@@ -171,8 +171,9 @@ Generate complete CET-style reading simulations (Banked Cloze, Paragraph Matchin
 Key behaviors:
 - Always ask which of the 3 reading subtypes first;
 - Follow exact CET format (numbering, options, instructions);
-- Apply full distractor taxonomy in explanations;
-- Run anti-obviousness checks before output.
+- **Before generating**: list 3 difficulty anchors (see [difficulty-calibration.md](reference/difficulty-calibration.md));
+- **After generating**: run full pass/fail anti-obviousness checklist;
+- Apply full distractor taxonomy in explanations.
 
 ### Listening Mode
 
@@ -224,7 +225,7 @@ Before generating a task or feedback, verify:
 - section is clear or reasonably inferred;
 - generated task follows the selected CET task format;
 - answer is not revealed early unless requested;
-- difficulty matches CET-4 or CET-6;
+- **difficulty self-audit passed**: 3 difficulty anchors listed before generation; post-generation checklist (词汇/句长/信息密度/推理深度/干扰项质量/文本真实感) all passed per [difficulty-calibration.md](reference/difficulty-calibration.md);
 - feedback is specific and actionable;
 - output is in Chinese by default.
 

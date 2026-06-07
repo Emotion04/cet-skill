@@ -1,5 +1,7 @@
 # Reading Mode Reference
 
+> **难度校准**: 生成任何阅读题目前，必须先完成 [difficulty-calibration.md](difficulty-calibration.md) 中规定的**生成前难度锚点**和**生成后难度自检**。本文件中的所有难度描述均以该文件中的量化指标为准。
+
 ## Goal
 
 Generate full CET-style reading simulations that are closer to the texture of real CET reading: not only correct in format, but also closer in article density, option ambiguity, paraphrase depth, and distractor design.
@@ -27,35 +29,27 @@ Recognize common names and route them as follows:
 - "长篇阅读", "信息匹配", "段落匹配", "paragraph matching" → Paragraph Matching;
 - "仔细阅读", "传统阅读", "选择题阅读", "careful reading" → Careful Reading.
 
-## Reading Difficulty Upgrade
+## Reading Difficulty Control
 
-Before generating any reading task, apply these standards.
+难度控制以 [difficulty-calibration.md](difficulty-calibration.md) 中的量化指标为准。核心要求摘要：
 
-### CET-4 Reading Style
+- **词汇**: CET-4 80%+ 四级词表内；CET-6 须含 15–25% 六级词汇
+- **句长**: CET-4 平均 14–20 词；CET-6 平均 20–30 词，含 3+ 种复杂句式
+- **信息密度**: CET-4 每段 1–2 信息点；CET-6 每段 2–4 信息点，无"水分句"
+- **推理深度**: CET-4 主力 L1；CET-6 L2/L3 占 50%+，配推理层级分布
+- **干扰项**: CET-4 无 G1 项，至少 1 个 G3；CET-6 至少 2 个 G3/G4，主旨题含 G5
+- **文本真实感**: CET-6 须含 2+ 项必选特征（让步/多重因果/研究引用/对比视角/反直觉发现），禁止五段式 AI 论文体
 
-Use:
+### Difficulty Anchor (Pre-Generation — Mandatory)
 
-- familiar but not childish topics;
-- clear paragraph progression;
-- moderate information density;
-- some paraphrase and synonym replacement;
-- distractors that are plausible but still resolvable through careful reading.
+生成任何阅读文章和题目**之前**，必须先在内部列出 3 个难度锚点：
 
-CET-4 should not become vocabulary-heavy or overly abstract, but it should still require real comprehension.
+> 本题难度锚点：
+> 1. {锚点 1：具体说明难度来源}
+> 2. {锚点 2}
+> 3. {锚点 3}
 
-### CET-6 Reading Style
-
-Use a more authentic article-like style:
-
-- topics may involve education, labor markets, technology, science communication, psychology, health, ecology, urban life, cultural change, economic behavior, or public policy;
-- avoid overly neat five-paragraph AI essays;
-- reduce obvious signposting such as "This shift is not entirely negative," "Yet there is a risk," "Moreover," and "Therefore" when they make the logic too transparent;
-- use more compact sentences, nominalizations, appositives, concessive clauses, qualification, contrast, and mild irony or reservation when appropriate;
-- allow the author's stance to emerge through framing and word choice rather than always stating it directly;
-- include examples whose relationship to the main point requires interpretation;
-- avoid turning every answer into a direct synonym of one sentence.
-
-CET-6 careful-reading passages should feel like edited excerpts from quality English media rather than simplified textbook essays.
+如果列不出 3 个具体锚点，**不生成，重新设计题目方向**。锚点不允许泛泛而谈（如"词汇较难"），必须具体（如"选项 B 的 partial truth 需要读者区分 study's finding vs author's own claim"）。
 
 ## Simulation Principle
 
@@ -236,16 +230,38 @@ Distractors:
 
 For CET-6, at least two distractors in each question should be plausible enough that a student must return to the passage and compare details.
 
-### Anti-Obviousness Check Before Output
+### Anti-Obviousness Check (Post-Generation — Mandatory, Pass/Fail)
 
-Before presenting a careful-reading task, internally check:
+生成后，逐项验证。**任一 Fail 项必须修正后方可输出**。
 
-- Can the correct answer be chosen by matching one obvious phrase from the passage? If yes, rewrite the option.
-- Are two or more wrong options obviously unrelated to the passage? If yes, rewrite them using plausible but flawed logic.
-- Does the passage rely too heavily on simple signposts? If yes, make the prose more article-like.
-- Does each question test understanding rather than mere word spotting? If not, revise.
-- Are the correct options consistently longer, more moderate, or more academic than the distractors? If yes, balance option style.
-- For CET-6, does the task feel closer to a quality-media adapted article than to a standard AI-generated essay? If not, revise.
+#### 选项匹配测试
+- [ ] **Pass**: 正确选项不包含原文 evidence 句中的标志性词语（除非该词语不可替代）
+- [ ] **Fail**: 读者只需匹配一个明显短语即可选出正确答案 → 重写正确选项为 paraphrase
+- [ ] **Fail**: 两个以上错误选项与文章话题明显无关 → 给每个错误选项加入部分正确元素
+
+#### 干扰项排除测试
+- [ ] **Pass (CET-4)**: 每题至少 1 个干扰项需要读者比对原文才能排除
+- [ ] **Pass (CET-6)**: 每题至少 2 个干扰项需要读者仔细比对原文细节才能排除
+- [ ] **Fail**: 存在 "obviously wrong" 干扰项（极端词/反义词/话题无关项） → 重写为带有 partial truth 的陷阱
+
+#### 推理深度测试
+- [ ] **Pass (CET-4)**: L0 直接定位题 ≤ 4 题（总共 10 题），至少 1 题 L2+
+- [ ] **Pass (CET-6)**: L2/L3 推理题 ≥ 5 题（总共 10 题），包括至少 1 题 L3 隐含推理
+- [ ] **Fail**: CET-6 题目全部可通过对原文单句改写定位 → 增加推断题和主旨题
+
+#### 选项风格测试
+- [ ] **Pass**: 正确选项与干扰项在长度、语气、用词学术度上大致均衡
+- [ ] **Fail**: 正确选项明显更长、更温和、更"学术" → 平衡选项风格
+- [ ] **Fail**: 所有干扰项格式雷同（如全是原文词但逻辑错） → 多样化干扰策略
+
+#### 文章真实感测试 (CET-6)
+- [ ] **Pass**: 文章包含至少 2 项 CET-6 必选文本特征（让步/多重因果/研究引用/对比视角/反直觉发现）
+- [ ] **Pass**: 文章不呈现整齐的五段式结构，论点不完全在首尾句
+- [ ] **Fail**: 文章读起来像 AI 教科书范文 → 重写为更接近媒体文章的风格
+- [ ] **Fail**: 每段都是 "topic sentence + explanation + example" → 打乱结构
+
+#### 全量指标对照
+- [ ] 参照 [difficulty-calibration.md](difficulty-calibration.md) 第七章 "生成后难度自检"，逐项勾选通过
 
 After the user answers, explain:
 

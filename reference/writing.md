@@ -1,5 +1,7 @@
 # Writing Mode Reference
 
+> **难度校准**: 生成任何写作题目之前，必须先列出 3 个难度锚点。难度控制参照 [difficulty-calibration.md](difficulty-calibration.md) 中的量化指标。
+
 ## Goal
 
 Generate original writing tasks, correct essays, estimate level, provide revision advice, and help the user build flexible templates without encouraging mechanical template abuse.
@@ -50,6 +52,19 @@ When the user selects writing:
 3. label each topic with task type and difficulty;
 4. ask the user to choose one and write;
 5. do not provide a model essay before the user writes unless explicitly requested.
+
+### Difficulty Anchor (Pre-Generation — Mandatory)
+
+生成 3 个作文题目之前，先在内部对每个题目列出难度锚点：
+
+> 题目 {X} 难度锚点：
+> 1. {锚点 1：如 "需要区分现象描述和原因分析，很多考生会混淆"}
+> 2. {锚点 2：如 "核心论据需要抽象概括而非举例堆砌"}
+> 3. {锚点 3}
+
+CET-6 题目锚点必须包含至少 1 个"认知难度"来源（如需要权衡多个立场、需要区分表象和本质、话题本身存在争议性）。
+
+如果某个题目列不出 3 个具体锚点，替换该题目。
 
 Avoid saying "今年必考." Prefer:
 
